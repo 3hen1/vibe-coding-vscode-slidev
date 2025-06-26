@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe Coding Training - Mind Map</title>
+    <script src="https://unpkg.com/d3@7"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 0 auto;
+            max-width: 95vw;
+            height: 90vh;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .mindmap-container {
+            width: 100%;
+            height: calc(100% - 100px);
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            background: radial-gradient(circle at center, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        .node {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .node circle {
+            stroke-width: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .node:hover circle {
+            stroke-width: 5px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+        }
+
+        .node text {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 600;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            transition: all 0.3s ease;
+        }
+
+        .link {
+            fill: none;
+            stroke-width: 3;
+            stroke-linecap: round;
+            transition: all 0.3s ease;
+        }
+
+        .central-node circle {
+            fill: #667eea;
+            stroke: #4c51bf;
+        }
+
+        .central-node text {
+            fill: white;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .part-node circle {
+            fill: #764ba2;
+            stroke: #553c7b;
+        }
+
+        .part-node text {
+            fill: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .slide-node circle {
+            fill: #48bb78;
+            stroke: #38a169;
+        }
+
+        .slide-node text {
+            fill: white;
+            font-size: 12px;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(45, 55, 72, 0.95);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-btn:hover {
+            background: rgba(102, 126, 234, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="floating-elements">
+            <div class="floating-circle" style="width: 100px; height: 100px; top: 10%; left: 80%; animation-delay: 0s;">
+            </div>
+            <div class="floating-circle" style="width: 150px; height: 150px; top: 60%; left: 5%; animation-delay: 2s;">
+            </div>
+            <div class="floating-circle" style="width: 80px; height: 80px; top: 20%; left: 10%; animation-delay: 4s;">
+            </div>
+        </div>
+
+        <h1>🚀 Vibe Coding Training Structure</h1>
+
+        <div class="controls">
+            <button class="control-btn" onclick="resetZoom()">Reset View</button>
+            <button class="control-btn" onclick="expandAll()">Expand All</button>
+        </div>
+
+        <div class="mindmap-container">
+            <svg id="mindmap"></svg>
+        </div>
+
+        <div class="tooltip" id="tooltip"></div>
+    </div>
+
+    <script>
+        // Mind map data structure
+        const data = {
+            name: "Vibe Coding Training",
+            children: [
+                {
+                    name: "Part 1: Welcome to Vibe Coding",
+                    subtitle: "(Mindset)",
+                    children: [
+                        { name: "Cover Page", description: "Title, subtitle, logos and dynamic GIF" },
+                        { name: "Programming Paradigm Shift", description: "From Grind Coding to Vibe Coding" },
+                        { name: "Core Toolkit", description: "VS Code + GitHub Copilot synergy" }
+                    ]
+                },
+                {
+                    name: "Part 2: Environment Setup",
+                    subtitle: "(Preparation)",
+                    children: [
+                        { name: "VS Code Installation", description: "Download, install, essential extensions" },
+                        { name: "GitHub Copilot Setup", description: "Install, authorize, verify" },
+                        { name: "Interface Overview", description: "Explorer, Editor, Terminal, Source Control" }
+                    ]
+                },
+                {
+                    name: "Part 3: Core Skills",
+                    subtitle: "(Hands-on)",
+                    children: [
+                        { name: "Code Completion", description: "Comment-driven development" },
+                        { name: "Copilot Chat", description: "Slash commands and free-form chat" },
+                        { name: "Inline Chat", description: "Immersive editing experience" },
+                        { name: "Smart Actions", description: "Lightbulb suggestions" }
+                    ]
+                },
+                {
+                    name: "Part 4: Complete Workflow",
+                    subtitle: "(Workflow)",
+                    children: [
+                        { name: "Case Study", description: "Building To-Do List API" },
+                        { name: "Project Initialization", description: "Structure planning with AI" },
+                        { name: "Core Logic Development", description: "AI-assisted coding" },
+                        { name: "Debugging & Testing", description: "VS Code debugger + AI tests" },
+                        { name: "Code Commit", description: "Source control with AI messages" }
+                    ]
+                },
+                {
+                    name: "Part 5: Best Practices",
+                    subtitle: "(Principles)",
+                    children: [
+                        { name: "AI Conductor Skills", description: "Art of prompting" },
+                        { name: "Critical Thinking", description: "Review and own your code" },
+                        { name: "Security & Privacy", description: "Red lines and team policies" }
+                    ]
+                },
+                {
+                    name: "Part 6: Summary",
+                    subtitle: "(Outlook)",
+                    children: [
+                        { name: "New Development Workflow", description: "Intent → AI → Review → Optimize" },
+                        { name: "Q&A & Resources", description: "Documentation and next steps" }
+                    ]
+                }
+            ]
+        };
+
+        // SVG setup
+        const container = d3.select('#mindmap');
+        const containerElement = document.querySelector('.mindmap-container');
+        const width = containerElement.clientWidth;
+        const height = containerElement.clientHeight;
+
+        const svg = container
+            .attr('width', width)
+            .attr('height', height);
+
+        const g = svg.append('g');
+
+        // Zoom behavior
+        const zoom = d3.zoom()
+            .scaleExtent([0.1, 3])
+            .on('zoom', (event) => {
+                g.attr('transform', event.transform);
+            });
+
+        svg.call(zoom);
+
+        // Create tree layout
+        const tree = d3.tree()
+            .size([height * 0.8, width * 0.8])
+            .separation((a, b) => (a.parent == b.parent ? 1 : 2) / a.depth);
+
+        // Process data
+        const root = d3.hierarchy(data);
+        tree(root);
+
+        // Create color scale
+        const colorScale = d3.scaleOrdinal()
+            .domain([0, 1, 2])
+            .range(['#667eea', '#764ba2', '#48bb78']);
+
+        // Draw links
+        const links = g.selectAll('.link')
+            .data(root.links())
+            .enter().append('path')
+            .attr('class', 'link')
+            .attr('d', d3.linkHorizontal()
+                .x(d => d.y + width / 2 - 300)
+                .y(d => d.x + height / 2 - 200))
+            .style('stroke', d => colorScale(d.target.depth))
+            .style('stroke-opacity', 0.6);
+
+        // Draw nodes
+        const nodes = g.selectAll('.node')
+            .data(root.descendants())
+            .enter().append('g')
+            .attr('class', d => `node ${d.depth === 0 ? 'central-node' : d.depth === 1 ? 'part-node' : 'slide-node'}`)
+            .attr('transform', d => `translate(${d.y + width / 2 - 300},${d.x + height / 2 - 200})`);
+
+        // Add circles
+        nodes.append('circle')
+            .attr('r', d => d.depth === 0 ? 30 : d.depth === 1 ? 25 : 20)
+            .style('fill', d => colorScale(d.depth))
+            .style('stroke', d => d3.color(colorScale(d.depth)).darker(1));
+
+        // Add text
+        nodes.append('text')
+            .text(d => {
+                if (d.depth === 0) return d.data.name;
+                if (d.depth === 1) return d.data.name.split(':')[1] || d.data.name;
+                return d.data.name;
+            })
+            .style('font-size', d => d.depth === 0 ? '14px' : d.depth === 1 ? '12px' : '10px')
+            .style('fill', 'white')
+            .call(wrap, d => d.depth === 0 ? 60 : d.depth === 1 ? 50 : 40);
+
+        // Add subtitle for part nodes
+        nodes.filter(d => d.depth === 1 && d.data.subtitle)
+            .append('text')
+            .attr('dy', '20')
+            .text(d => d.data.subtitle)
+            .style('font-size', '10px')
+            .style('fill', 'rgba(255,255,255,0.8)')
+            .style('text-anchor', 'middle');
+
+        // Tooltip
+        const tooltip = d3.select('#tooltip');
+
+        nodes
+            .on('mouseover', function (event, d) {
+                if (d.data.description) {
+                    tooltip
+                        .style('opacity', 1)
+                        .html(`<strong>${d.data.name}</strong><br/>${d.data.description}`)
+                        .style('left', (event.pageX + 10) + 'px')
+                        .style('top', (event.pageY - 10) + 'px');
+                }
+            })
+            .on('mouseout', function () {
+                tooltip.style('opacity', 0);
+            })
+            .on('mousemove', function (event) {
+                tooltip
+                    .style('left', (event.pageX + 10) + 'px')
+                    .style('top', (event.pageY - 10) + 'px');
+            });
+
+        // Text wrapping function
+        function wrap(text, width) {
+            text.each(function () {
+                const text = d3.select(this);
+                const words = text.text().split(/\s+/).reverse();
+                let word;
+                let line = [];
+                let lineNumber = 0;
+                const lineHeight = 1.1;
+                const y = text.attr('y') || 0;
+                const dy = 0;
+                let tspan = text.text(null).append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 'em');
+
+                while (word = words.pop()) {
+                    line.push(word);
+                    tspan.text(line.join(' '));
+                    if (tspan.node().getComputedTextLength() > width) {
+                        line.pop();
+                        tspan.text(line.join(' '));
+                        line = [word];
+                        tspan = text.append('tspan').attr('x', 0).attr('y', y).attr('dy', ++lineNumber * lineHeight + dy + 'em').text(word);
+                    }
+                }
+            });
+        }
+
+        // Control functions
+        function resetZoom() {
+            svg.transition().duration(750).call(
+                zoom.transform,
+                d3.zoomIdentity
+            );
+        }
+
+        function expandAll() {
+            // Simple animation to highlight all nodes
+            nodes.selectAll('circle')
+                .transition()
+                .duration(500)
+                .attr('r', d => (d.depth === 0 ? 30 : d.depth === 1 ? 25 : 20) * 1.2)
+                .transition()
+                .duration(500)
+                .attr('r', d => d.depth === 0 ? 30 : d.depth === 1 ? 25 : 20);
+        }
+
+        // Initial zoom to fit content
+        setTimeout(() => {
+            const bounds = g.node().getBBox();
+            const fullWidth = width;
+            const fullHeight = height;
+            const widthRatio = fullWidth / bounds.width;
+            const heightRatio = fullHeight / bounds.height;
+            const scale = Math.min(widthRatio, heightRatio) * 0.8;
+            const translateX = (fullWidth - bounds.width * scale) / 2 - bounds.x * scale;
+            const translateY = (fullHeight - bounds.height * scale) / 2 - bounds.y * scale;
+
+            svg.call(zoom.transform, d3.zoomIdentity.translate(translateX, translateY).scale(scale));
+        }, 100);
+
+        // Make functions global for button access
+        window.resetZoom = resetZoom;
+        window.expandAll = expandAll;
+    </script>
+</body>
+
+</html>
