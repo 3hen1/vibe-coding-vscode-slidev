@@ -2,9 +2,9 @@
   "name": "vibe-coding-vscode-slidev",
   "type": "module",
   "private": false,
-  "homepage": "https://USERNAME.github.io/REPOSITORY_NAME",
+  "homepage": "https://3hen1.github.io/vibe-coding-vscode-slidev",
   "scripts": {
-    "build": "slidev build --base /REPOSITORY_NAME/",
+    "build": "slidev build --base /vibe-coding-vscode-slidev/",
     "build:local": "slidev build",
     "dev": "slidev --open",
     "export": "slidev export",
