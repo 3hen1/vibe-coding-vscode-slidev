@@ -135,51 +135,79 @@
 
 #### **Part 4: 融会贯通 - 一个完整功能的开发流程 (工作流篇)**
 
-*   **Slide 12: 案例：从零到一，开发一个“待办事项”API**
-    *   **目标：** 展示一个贴近真实项目需求的端到端工作流。
+*   **Slide 12: 案例：从零到一，开发一个"待办事项"服务**
+    *   **目标：** 展示一个贴近真实项目需求的端到端工作流，使用 Java 21 + Spring Boot 3。
 
 *   **Slide 13: Step 1: 项目初始化与结构规划**
     *   **操作：**
-        1.  在终端 (`Ctrl+` \`) 使用 `npm init -y` 初始化项目。
-        2.  打开 **Copilot Chat** 提问：“请为我规划一个简单的 Express.js 项目结构，包含路由、控制器和模型。”
-        3.  根据建议创建文件夹和文件。
+        1.  在终端 (`Ctrl+` \`) 使用 Spring Initializr：`curl https://start.spring.io/starter.zip -d dependencies=web,data-jpa,h2 -d type=gradle-project -d javaVersion=21 -d bootVersion=3.2.0 -d groupId=com.example -d artifactId=todo-service -o todo-service.zip && unzip todo-service.zip`
+        2.  打开 **Copilot Chat** 提问："请为我规划一个 Spring Boot 3 项目结构，包含 RESTful API 和 gRPC 接口，使用 Java 21 特性。需要包含实体类、服务层、控制器和配置类。"
+        3.  根据建议创建包结构：`entity`、`service`、`controller`、`config`、`grpc` 等。
 
 *   **Slide 14: Step 2: 编写核心逻辑 (以 "添加待办事项" 为例)**
     *   **操作：**
-        1.  在 `todoController.js` 中，写下注释：`// 控制器函数：创建一个新的待办事项`。
-        2.  **Copilot 自动补全** 函数框架。
-        3.  使用 **内联聊天 (`Ctrl+I`)** 添加输入验证逻辑：“请为请求体添加 a,b,c 验证”。
-        4.  在对应的 `todo.js` 路由文件中，通过注释或部分代码引导 **Copilot 补全** Express 路由定义。
+        1.  在 `TodoEntity.java` 中，写下注释：`// JPA 实体类：待办事项`。
+        2.  **Copilot 自动补全** 实体类定义，包含 `@Entity`、`@Id`、`@GeneratedValue` 等注解。
+        3.  在 `TodoService.java` 中写注释：`// 服务层：处理待办事项业务逻辑`，让 Copilot 生成服务方法。
+        4.  在 `TodoController.java` 中，使用 **内联聊天 (`Ctrl+I`)** 添加 RESTful API："请创建 CRUD 操作的 REST 端点，使用 Spring Boot 3 的最佳实践和 Java 21 特性"。
+        5.  创建 `todo.proto` 文件，写下注释：`// gRPC 服务定义：待办事项服务`，让 **Copilot 补全** Protocol Buffers 定义。
+        6.  在 `TodoGrpcService.java` 中实现 gRPC 服务端。
 
 *   **Slide 15: Step 3: 调试与测试**
     *   **操作：**
-        1.  **VS Code Debugger:** 设置断点，启动调试，观察变量。
-        2.  **Copilot Chat:** 选中 `addTodo` 函数，使用 `/tests` 命令生成单元测试框架。
-        3.  补全测试用例，并在终端运行测试。
+        1.  **VS Code Debugger:** 在 `TodoService.createTodo()` 方法设置断点，启动调试，观察对象状态。
+        2.  **Copilot Chat:** 选中 `TodoController` 类，使用 `/tests` 命令生成单元测试和集成测试框架：
+            ```java
+            // 生成 @WebMvcTest 测试类
+            // 生成 @SpringBootTest 集成测试
+            // 生成 gRPC 客户端测试
+            ```
+        3.  使用 **内联聊天** 补充测试用例："请添加边界条件测试和异常处理测试"。
+        4.  在终端运行测试：`./gradlew test`。
 
 *   **Slide 16: Step 4: 代码提交**
     *   **操作：**
         1.  打开 **VS Code 源代码管理** 视图，查看变更。
-        2.  暂存 (Stage) 文件。
-        3.  **彩蛋技巧：** 在提交信息输入框，点击 **✨ (Sparkle) 图标**，让 Copilot 根据你的代码变更自动生成规范的 Commit Message！
-        4.  提交并推送。
+        2.  暂存 (Stage) 文件，注意排除 `build/` 目录和 IDE 配置文件。
+        3.  **彩蛋技巧：** 在提交信息输入框，点击 **✨ (Sparkle) 图标**，让 Copilot 根据你的代码变更自动生成规范的 Commit Message：
+            ```
+            feat: implement todo service with REST and gRPC APIs
+            
+            - Add TodoEntity with JPA annotations
+            - Implement TodoService with CRUD operations  
+            - Create RESTful endpoints in TodoController
+            - Add gRPC service definition and implementation
+            - Include comprehensive unit and integration tests
+            ```
+        4.  提交并推送到远程仓库。
+
+*   **Slide 17: 扩展演示：Java 21 特性与现代化开发**
+    *   **操作：**
+        1.  **Copilot Chat:** 提问："如何在这个项目中使用 Java 21 的 Record、Pattern Matching 和 Virtual Threads？"
+        2.  重构代码使用 Record 作为 DTO：
+            ```java
+            // 让 Copilot 生成现代化的 Java 21 代码
+            public record TodoRequest(String title, String description, boolean completed) {}
+            ```
+        3.  使用 **内联聊天** 添加 Virtual Threads 支持："请配置 Spring Boot 3 使用 Virtual Threads"。
+        4.  演示 **Copilot** 如何帮助重构传统代码为现代 Java 21 语法。
 
 ---
 
 #### **Part 5: 高手进阶 - 最佳实践与注意事项 (原则篇)**
 
-*   **Slide 17: 成为一名优秀的“AI 指挥家”**
+*   **Slide 18: 成为一名优秀的“AI 指挥家”**
     *   **提问的艺术 (The Art of Prompting):**
         *   **清晰、具体：** "写一个函数" vs "写一个JavaScript异步函数，使用axios从URL获取数据，并处理JSON响应"。
         *   **提供上下文：** 先贴出相关代码或数据结构，再提出你的问题。
         *   **迭代优化：** 如果第一次结果不理想，尝试换一种方式提问或补充更多信息。
 
-*   **Slide 18: 你仍然是船长：批判性思维**
+*   **Slide 19: 你仍然是船长：批判性思维**
     *   **AI不是神，是助手：** Copilot 会犯错！它生成的代码可能存在 Bug、性能问题或安全漏洞。
     *   **黄金法则：永远不要提交你不理解的代码！**
     *   **你的职责：** 审查、理解、测试、并最终对代码负责。
 
-*   **Slide 19: 安全与隐私红线**
+*   **Slide 20: 安全与隐私红线**
     *   **切勿在代码中包含敏感信息：** 不要在注释或代码中硬编码 API Keys、密码、个人身份信息等。
     *   **注意代码来源：** Copilot 的训练数据来自公开代码库，注意生成的代码是否包含不合适的许可协议。
     *   **团队规范：** 与团队讨论并确定AI辅助编程的使用规范。
@@ -188,13 +216,13 @@
 
 #### **Part 6: 总结与展望**
 
-*   **Slide 20: 总结：你的新开发工作流**
+*   **Slide 21: 总结：你的新开发工作流**
     *   **意图优先：** 先用自然语言或注释描述要做什么。
     *   **AI生成：** 让 Copilot 完成重复、模式化的工作。
     *   **你来审查与优化：** 你的价值在于设计、架构、审查和创造性的解决问题。
     *   **持续学习：** 利用 Copilot 的 `/explain` 功能，把它当成你的私人导师，加速学习新技术。
 
-*   **Slide 21: Q&A / 资源链接**
+*   **Slide 22: Q&A / 资源链接**
     *   **标题：** 开始你的 Vibe Coding 之旅！
     *   **资源列表：**
         *   VS Code 官方文档

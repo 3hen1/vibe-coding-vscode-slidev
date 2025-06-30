@@ -134,53 +134,82 @@
 
 ---
 
-#### **Part 4: Putting It All Together – A Complete Feature Development Workflow (Workflow)**
+#### **Part 4: Putting It All Together - A Complete Feature Development Workflow (Workflow)**
 
-*   **Slide 11: Case Study – Building a "To-Do List" API from Scratch**
-    *   **Goal:** Demonstrate an end-to-end workflow based on real project needs.
+*   **Slide 12: Case Study: From Zero to One, Developing a "To-Do" Service**
+    *   **Goal:** Demonstrate an end-to-end workflow that mirrors real project requirements, using Java 21 + Spring Boot 3.
 
-*   **Slide 12: Step 1 – Project Initialization & Structure Planning**
-    *   **Steps:**
-        1.  In the terminal (`Ctrl+` \`), run `npm init -y` to initialize the project.
-        2.  Open **Copilot Chat** and ask: "Please design a simple Express.js project structure with routes, controllers, and models."
-        3.  Create folders and files based on the suggestions.
+*   **Slide 13: Step 1: Project Initialization & Structure Planning**
+    *   **Actions:**
+        1.  In the terminal (`Ctrl+` \`), use Spring Initializr: `curl https://start.spring.io/starter.zip -d dependencies=web,data-jpa,h2 -d type=gradle-project -d javaVersion=21 -d bootVersion=3.2.0 -d groupId=com.example -d artifactId=todo-service -o todo-service.zip && unzip todo-service.zip`
+        2.  Open **Copilot Chat** and ask: "Please plan a Spring Boot 3 project structure for me, including RESTful API and gRPC interfaces, using Java 21 features. It should include entity, service, controller, and configuration classes."
+        3.  Based on the suggestions, create the package structure: `entity`, `service`, `controller`, `config`, `grpc`, etc.
 
-*   **Slide 13: Step 2 – Writing Core Logic (e.g., "Add To-Do Item")**
-    *   **Steps:**
-        1.  In `todoController.js`, add a comment: `// Controller function: create a new to-do item`.
-        2.  **Copilot autocompletes** the function skeleton.
-        3.  Use **Inline Chat (`Ctrl+I`)** to add input validation: "Add validation for a, b, c in the request body."
-        4.  In the corresponding `todo.js` route file, use comments or partial code to guide **Copilot** in completing the Express route definition.
+*   **Slide 14: Step 2: Writing Core Logic (Using "Add To-Do Item" as an example)**
+    *   **Actions:**
+        1.  In `TodoEntity.java`, write the comment: `// JPA entity class: To-Do Item`.
+        2.  **Copilot autocompletes** the entity class definition, including `@Entity`, `@Id`, `@GeneratedValue` annotations.
+        3.  In `TodoService.java`, write the comment: `// Service layer: Handle to-do item business logic`, and let Copilot generate the service methods.
+        4.  In `TodoController.java`, use **Inline Chat (`Ctrl+I`)** to add the RESTful API: "Please create REST endpoints for CRUD operations, using Spring Boot 3 best practices and Java 21 features."
+        5.  Create a `todo.proto` file and write the comment: `// gRPC service definition: To-Do service`, and let **Copilot complete** the Protocol Buffers definition.
+        6.  Implement the gRPC server-side logic in `TodoGrpcService.java`.
 
-*   **Slide 14: Step 3 – Debugging & Testing**
-    *   **Steps:**
-        1.  **VS Code Debugger:** Set breakpoints, start debugging, inspect variables.
-        2.  **Copilot Chat:** Select the `addTodo` function and use the `/tests` command to generate a unit test skeleton.
-        3.  Complete test cases and run tests in the terminal.
+*   **Slide 15: Step 3: Debugging & Testing**
+    *   **Actions:**
+        1.  **VS Code Debugger:** Set a breakpoint in the `TodoService.createTodo()` method, start debugging, and inspect the object's state.
+        2.  **Copilot Chat:** Select the `TodoController` class and use the `/tests` command to generate unit and integration test frameworks:
+            ```java
+            // Generate @WebMvcTest test class
+            // Generate @SpringBootTest integration test
+            // Generate gRPC client test
+            ```
+        3.  Use **Inline Chat** to add more test cases: "Please add tests for boundary conditions and exception handling."
+        4.  Run the tests in the terminal: `./gradlew test`.
 
-*   **Slide 15: Step 4 – Code Commit**
-    *   **Steps:**
-        1.  Open the **VS Code Source Control** view to review changes.
-        2.  Stage files.
-        3.  **Pro tip:** In the commit message box, click the **✨ (Sparkle) icon** to let Copilot generate a conventional commit message based on your code changes!
-        4.  Commit and push.
+*   **Slide 16: Step 4: Code Commit**
+    *   **Actions:**
+        1.  Open the **VS Code Source Control** view to see the changes.
+        2.  Stage the files, being careful to exclude the `build/` directory and IDE configuration files.
+        3.  **Pro Tip:** In the commit message input box, click the **✨ (Sparkle) icon** to have Copilot automatically generate a conventional commit message based on your code changes:
+            ```
+            feat: implement todo service with REST and gRPC APIs
+            
+            - Add TodoEntity with JPA annotations
+            - Implement TodoService with CRUD operations  
+            - Create RESTful endpoints in TodoController
+            - Add gRPC service definition and implementation
+            - Include comprehensive unit and integration tests
+            ```
+        4.  Commit and push to the remote repository.
+
+*   **Slide 17: Extended Demo: Java 21 Features & Modern Development**
+    *   **Actions:**
+        1.  **Copilot Chat:** Ask: "How can I use Java 21's Records, Pattern Matching, and Virtual Threads in this project?"
+        2.  Refactor the code to use Records as DTOs:
+            ```java
+            // Let Copilot generate modern Java 21 code
+            public record TodoRequest(String title, String description, boolean completed) {}
+            ```
+        3.  Use **Inline Chat** to add Virtual Threads support: "Please configure Spring Boot 3 to use Virtual Threads."
+        4.  Demonstrate how **Copilot** helps refactor traditional code into modern Java 21 syntax.
 
 ---
 
+
 #### **Part 5: Advanced – Best Practices & Cautions (Principles)**
 
-*   **Slide 16: Becoming an Excellent "AI Conductor"**
+*   **Slide 17: Becoming an Excellent "AI Conductor"**
     *   **The Art of Prompting:**
         *   **Be clear and specific:** "Write a function" vs. "Write an asynchronous JavaScript function that uses axios to fetch data from a URL and process the JSON response."
         *   **Provide context:** Share relevant code or data structures before asking your question.
         *   **Iterate and refine:** If the first result isn't ideal, try rephrasing or adding more details.
 
-*   **Slide 17: You're Still the Captain – Critical Thinking**
+*   **Slide 18: You're Still the Captain – Critical Thinking**
     *   **AI is an assistant, not a god:** Copilot can make mistakes! Its code may have bugs, performance issues, or security flaws.
     *   **Golden rule: Never commit code you don't understand!**
     *   **Your responsibility:** Review, understand, test, and ultimately own your code.
 
-*   **Slide 18: Security & Privacy Red Lines**
+*   **Slide 19: Security & Privacy Red Lines**
     *   **Never include sensitive information in code:** Don't hardcode API keys, passwords, or personal data in comments or code.
     *   **Be mindful of code origins:** Copilot is trained on public codebases—check if generated code has inappropriate licenses.
     *   **Team policies:** Discuss and establish guidelines for AI-assisted programming within your team.
@@ -189,13 +218,13 @@
 
 #### **Part 6: Summary & Outlook**
 
-*   **Slide 19: Summary – Your New Development Workflow**
+*   **Slide 20: Summary – Your New Development Workflow**
     *   **Intent first:** Start by describing what you want to do in natural language or comments.
     *   **AI generation:** Let Copilot handle repetitive, pattern-based work.
     *   **You review and optimize:** Your value lies in design, architecture, review, and creative problem-solving.
     *   **Continuous learning:** Use Copilot's `/explain` feature as your personal tutor to accelerate learning new technologies.
 
-*   **Slide 20: Q&A / Resources**
+*   **Slide 21: Q&A / Resources**
     *   **Title:** Start Your Vibe Coding Journey!
     *   **Resource list:**
         *   Official VS Code documentation
