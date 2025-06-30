@@ -1,11 +1,14 @@
 {
   "name": "vibe-coding-vscode-slidev",
   "type": "module",
-  "private": true,
+  "private": false,
+  "homepage": "https://USERNAME.github.io/REPOSITORY_NAME",
   "scripts": {
-    "build": "slidev build",
+    "build": "slidev build --base /REPOSITORY_NAME/",
+    "build:local": "slidev build",
     "dev": "slidev --open",
-    "export": "slidev export"
+    "export": "slidev export",
+    "preview": "slidev --open --remote"
   },
   "dependencies": {
     "@slidev/cli": "^51.8.2",
